@@ -15,12 +15,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jihad.spring.files.excel.model.Tutorial;
+import com.jihad.spring.files.excel.model.School;
 
-public class ExcelHelper {
+public class SchoolExcelHelper {
   public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-  static String[] HEADERs = { "Id", "Title", "Description", "Published" };
-  static String SHEET = "Tutorials";
+  static String[] HEADERs = { "Id", "School Code", "School Name", "Gender", "Bording" };
+  static String SHEET = "Schools";
 
   public static boolean hasExcelFormat(MultipartFile file) {
 
@@ -31,7 +31,7 @@ public class ExcelHelper {
     return true;
   }
 
-  public static ByteArrayInputStream tutorialsToExcel(List<Tutorial> tutorials) {
+  public static ByteArrayInputStream schoolsToExcel(List<School> schools) {
 
     try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
       Sheet sheet = workbook.createSheet(SHEET);
@@ -45,13 +45,14 @@ public class ExcelHelper {
       }
 
       int rowIdx = 1;
-      for (Tutorial tutorial : tutorials) {
+      for (School school : schools) {
         Row row = sheet.createRow(rowIdx++);
 
-        row.createCell(0).setCellValue(tutorial.getId());
-        row.createCell(1).setCellValue(tutorial.getTitle());
-        row.createCell(2).setCellValue(tutorial.getDescription());
-        row.createCell(3).setCellValue(tutorial.isPublished());
+        row.createCell(0).setCellValue(school.getId());
+        row.createCell(1).setCellValue(school.getSchoolCode());
+        row.createCell(2).setCellValue(school.getSchoolName());
+        row.createCell(3).setCellValue(school.getGender());
+        row.createCell(4).setCellValue(school.getBoarding());
       }
 
       workbook.write(out);
@@ -61,7 +62,7 @@ public class ExcelHelper {
     }
   }
 
-  public static List<Tutorial> excelToTutorials(InputStream is) {
+  public static List<School> excelToSchools(InputStream is) {
     try {
       /*Workbook workbook = new XSSFWorkbook(is);
       Sheet sheet = workbook.getSheet(SHEET);*/
@@ -71,7 +72,7 @@ public class ExcelHelper {
       
       Iterator<Row> rows = sheet.iterator();
 
-      List<Tutorial> tutorials = new ArrayList<Tutorial>();
+      List<School> schools = new ArrayList<School>();
 
       int rowNumber = 0;
       while (rows.hasNext()) {
@@ -85,7 +86,7 @@ public class ExcelHelper {
 
         Iterator<Cell> cellsInRow = currentRow.iterator();
 
-        Tutorial tutorial = new Tutorial();
+        School school = new School();
 
         int cellIdx = 0;
         while (cellsInRow.hasNext()) {
@@ -93,20 +94,24 @@ public class ExcelHelper {
 
           switch (cellIdx) {
           case 0:
-            tutorial.setId((long) currentCell.getNumericCellValue());
+            school.setId((long) currentCell.getNumericCellValue());
             break;
 
           case 1:
-            tutorial.setTitle(currentCell.getStringCellValue());
+            school.setSchoolCode(currentCell.getStringCellValue());
             break;
 
           case 2:
-            tutorial.setDescription(currentCell.getStringCellValue());
+            school.setSchoolName(currentCell.getStringCellValue());
             break;
 
           case 3:
-            tutorial.setPublished(currentCell.getBooleanCellValue());
+            school.setGender(currentCell.getStringCellValue());
             break;
+            
+          case 4:
+              school.setBoarding(currentCell.getStringCellValue());
+              break;
 
           default:
             break;
@@ -115,12 +120,12 @@ public class ExcelHelper {
           cellIdx++;
         }
 
-        tutorials.add(tutorial);
+        schools.add(school);
       }
 
       workbook.close();
 
-      return tutorials;
+      return schools;
     } catch (IOException e) {
       throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
     }

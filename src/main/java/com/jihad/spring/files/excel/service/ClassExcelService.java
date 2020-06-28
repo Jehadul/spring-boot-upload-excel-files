@@ -8,32 +8,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jihad.spring.files.excel.helper.ExcelHelper;
-import com.jihad.spring.files.excel.model.Tutorial;
-import com.jihad.spring.files.excel.repository.TutorialRepository;
+import com.jihad.spring.files.excel.helper.ClassExcelHelper;
+import com.jihad.spring.files.excel.model.Classes;
+import com.jihad.spring.files.excel.repository.ClassRepository;
 
 @Service
-public class ExcelService {
+public class ClassExcelService {
   @Autowired
-  TutorialRepository repository;
+  ClassRepository repository;
 
   public void save(MultipartFile file) {
     try {
-      List<Tutorial> tutorials = ExcelHelper.excelToTutorials(file.getInputStream());
-      repository.saveAll(tutorials);
+      List<Classes> classes = ClassExcelHelper.excelToClasses(file.getInputStream());
+      repository.saveAll(classes);
     } catch (IOException e) {
       throw new RuntimeException("fail to store excel data: " + e.getMessage());
     }
   }
 
   public ByteArrayInputStream load() {
-    List<Tutorial> tutorials = repository.findAll();
+    List<Classes> classes = repository.findAll();
 
-    ByteArrayInputStream in = ExcelHelper.tutorialsToExcel(tutorials);
+    ByteArrayInputStream in = ClassExcelHelper.classesToExcel(classes);
     return in;
   }
 
-  public List<Tutorial> getAllTutorials() {
+  public List<Classes> getAllClasses() {
     return repository.findAll();
   }
 }

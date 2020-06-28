@@ -10,31 +10,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jihad.spring.files.excel.helper.ExcelHelper;
+import com.jihad.spring.files.excel.helper.ClassExcelHelper;
 import com.jihad.spring.files.excel.message.ResponseMessage;
-import com.jihad.spring.files.excel.model.Tutorial;
-import com.jihad.spring.files.excel.service.ExcelService;
+import com.jihad.spring.files.excel.model.Classes;
+import com.jihad.spring.files.excel.service.ClassExcelService;
 
-@CrossOrigin("http://localhost:8081")
 @Controller
-@RequestMapping("/api/excel")
-public class ExcelController {
+@RequestMapping("/api/excel/classes")
+public class ClassExcelController {
 
   @Autowired
-  ExcelService fileService;
+  ClassExcelService fileService;
 
   @PostMapping("/upload")
   public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
     String message = "";
 
-    if (ExcelHelper.hasExcelFormat(file)) {
+    if (ClassExcelHelper.hasExcelFormat(file)) {
       try {
         fileService.save(file);
 
@@ -50,16 +48,16 @@ public class ExcelController {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
   }
 
-  @GetMapping("/tutorials")
-  public ResponseEntity<List<Tutorial>> getAllTutorials() {
+  @GetMapping("/classes")
+  public ResponseEntity<List<Classes>> getAllClasss() {
     try {
-      List<Tutorial> tutorials = fileService.getAllTutorials();
+      List<Classes> classes = fileService.getAllClasses();
 
-      if (tutorials.isEmpty()) {
+      if (classes.isEmpty()) {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       }
 
-      return new ResponseEntity<>(tutorials, HttpStatus.OK);
+      return new ResponseEntity<>(classes, HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -67,7 +65,7 @@ public class ExcelController {
 
   @GetMapping("/download")
   public ResponseEntity<Resource> getFile() {
-    String filename = "tutorials.xlsx";
+    String filename = "classes.xlsx";
     InputStreamResource file = new InputStreamResource(fileService.load());
 
     return ResponseEntity.ok()
